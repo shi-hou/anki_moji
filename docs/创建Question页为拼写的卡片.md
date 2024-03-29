@@ -34,9 +34,6 @@
     
     // 活用型版本A(五段/一段/カ变/サ变)或B(一类/二类/三类)，选填 'A' 或 'B'
     katuyouVersion = 'A'
-    
-    // 释义/详解(1)、笔记(2)的显示顺序，选填 "12" 或 "21"
-    showOrder = "21"
 </script>
 
 <div class="word-head">
@@ -175,15 +172,12 @@
         }
     }
     
-    wordDetailDom = document.querySelector('.word-detail')
-    if (wordDetailDom) {
-        const showOrderList = Array.from((showOrder || "12") + "3")
-        const showClassNameMap = {"1": "paraphrase", "2": "note", "3": "conjunctive"}
-        orderedChildDomList = showOrderList.map(index => document.querySelector('.' + showClassNameMap[index]))
-        wordDetailDom.innerHTML = ''
-        for (let child of orderedChildDomList) {
-            if (child) wordDetailDom.appendChild(child)
-        }
+    function changeDisplay(transId) {
+        const trans = document.getElementById('trans-' + transId);
+        if (trans.style.display === 'none')
+            trans.style.display = 'block'
+        else
+            trans.style.display = 'none'
     }
 </script>
 ```

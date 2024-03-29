@@ -539,8 +539,6 @@ body.nightMode {
     border-top: .5px solid var(--color-grey-third);
 }
 
-
-
 ruby rt {
     ruby-align: distribute-space;
     color: var(--color-grey-secondary) !important;
@@ -555,6 +553,28 @@ ruby rt {
 
 ruby rt:before {
     content: attr(hiragana);
+}
+
+.example-title {
+    padding-left: 16px;
+    font-size: 16px;
+    line-height: 20px; 
+}
+
+.example-trans {
+    padding-left: 16px;
+    color: #8b8787;
+    font-size: 14px;
+    line-height: 18px;
+    margin-bottom: 24px;
+}
+
+.word-trans {
+    font-size: 16px;
+    background: #acacac1a;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 16px;
 }'''
 
 front_pron = '''<div class="word-head">
@@ -605,9 +625,6 @@ detail = '''<script>
     
     // 活用型版本A(五段/一段/カ变/サ变)或B(一类/二类/三类)，选填 'A' 或 'B'
     katuyouVersion = 'A'
-    
-    // 释义/详解(1)、笔记(2)的显示顺序，选填 "12" 或 "21"
-    showOrder = "21"
 </script>
 
 <div class="word-head">
@@ -746,14 +763,11 @@ detail = '''<script>
         }
     }
     
-    wordDetailDom = document.querySelector('.word-detail')
-    if (wordDetailDom) {
-        const showOrderList = Array.from((showOrder || "12") + "3")
-        const showClassNameMap = {"1": "paraphrase", "2": "note", "3": "conjunctive"}
-        orderedChildDomList = showOrderList.map(index => document.querySelector('.' + showClassNameMap[index]))
-        wordDetailDom.innerHTML = ''
-        for (let child of orderedChildDomList) {
-            if (child) wordDetailDom.appendChild(child)
-        }
+    function changeDisplay(transId) {
+        const trans = document.getElementById('trans-' + transId);
+        if (trans.style.display === 'none')
+            trans.style.display = 'block'
+        else
+            trans.style.display = 'none'
     }
 </script>'''
