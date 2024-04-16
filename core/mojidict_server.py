@@ -275,6 +275,8 @@ class MojiServer:
                     sub_part_of_speech_title_list = []
                     jita = utils.get(part_of_speech, "jita")
                     katuyou = utils.get(part_of_speech, "katuyou")
+                    has_jita = jita is not None and jita >= 0
+                    has_katuyou = katuyou is not None and katuyou >= 0
                     part_of_speech_list = utils.get(part_of_speech, "partOfSpeech") or []
                     valid_part_of_speech_list = [part_of_speech for part_of_speech in part_of_speech_list if
                                                  part_of_speech is not None and 0 <= part_of_speech < 20]
@@ -302,7 +304,7 @@ class MojiServer:
                                                               "rgb(255, 169, 65)"
                                                               ][valid_part_of_speech_list[0]])
                         for partOfSpeech in valid_part_of_speech_list:
-                            if partOfSpeech != 8 or not jita:  # 动词会显示jita的“自动”/“他动”/“自他动”，因此不显示“动”
+                            if partOfSpeech != 8 or not has_jita:  # 动词会显示jita的“自动”/“他动”/“自他动”，因此不显示“动”
                                 sub_part_of_speech_title_list.append({
                                                                          0: "无",
                                                                          1: "名",
@@ -325,14 +327,14 @@ class MojiServer:
                                                                          18: "形シク",
                                                                          19: "枕词"
                                                                      }[partOfSpeech])
-                        if jita:
+                        if has_jita:
                             sub_part_of_speech_title_list.append({
                                                                      0: "无",
                                                                      1: "自动",
                                                                      2: "他动",
                                                                      3: "自他动"
                                                                  }[jita])
-                        if katuyou:
+                        if has_katuyou:
                             sub_part_of_speech_title_list.append({
                                                                      0: "无",
                                                                      1: "五段",
@@ -350,7 +352,7 @@ class MojiServer:
                                                                      13: "文言ラ变"
                                                                  }[katuyou])
                         part_of_speech_title_A_list.append("·".join(sub_part_of_speech_title_list))
-                        if katuyou:
+                        if has_katuyou:
                             sub_part_of_speech_title_list.pop()
                             sub_part_of_speech_title_list.append({
                                                                      0: "无",
