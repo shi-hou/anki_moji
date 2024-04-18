@@ -427,7 +427,7 @@ class MojiServer:
                 lang = utils.get(subdetail, "lang")
                 title = (utils.get(subdetail, "title") or "").replace("\n", "<br>")
                 context = (utils.get(subdetail, "context") or "").replace("\n", "<br>")
-                conjunctions = utils.get(subdetail, "conjunctions") or []
+                conjunctions = [conjunction for conjunction in utils.get(subdetail, "conjunctions") or [] if conjunction != ""]
                 if lang == "zh-CN":
                     subdetail_dict[subdetail_id]["title-zh"] = title
                     subdetail_dict[subdetail_id]["context-zh"] = context
