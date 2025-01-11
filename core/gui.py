@@ -451,7 +451,7 @@ class WordLoader(QRunnable):
                 raise
             storage.save_tts_file(file_path, content)
 
-        user_note = self.moji_server.get_user_note(r)
+        # user_note = self.moji_server.get_user_note(r)
 
         note = notes.Note(mw.col, model)
         note['target_id'] = r.target_id
@@ -463,7 +463,7 @@ class WordLoader(QRunnable):
         note['excerpt'] = r.excerpt
         note['accent'] = r.accent
         note['title'] = r.title
-        note['note'] = user_note
+        note['note'] = r.note
         note['part_of_speech'] = r.part_of_speech
         note['trans'] = r.trans
         note['examples'] = r.examples

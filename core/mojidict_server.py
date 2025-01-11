@@ -42,6 +42,7 @@ class MojiWord:
     part_of_speech: str
     trans: str
     examples: str
+    note: str
     parent: Optional[MojiFolder]
 
     @property
@@ -155,6 +156,7 @@ class MojiServer:
                                  detail['part_of_speech'] or '',
                                  detail['trans'] or '',
                                  detail['examples'] or '',
+                                 detail['note'] or '', 
                                  parent_moji_folder))
                 elif target_type == 103:
                     example = self.get_example(target_id)
@@ -172,6 +174,7 @@ class MojiServer:
                                  '',
                                  example.get('trans', ''),
                                  '',
+                                 '',
                                  parent_moji_folder))
                 elif target_type == 120:
                     sentence = sentences[target_id]
@@ -188,6 +191,7 @@ class MojiServer:
                                  '',
                                  '',
                                  sentence.get('trans', ''),
+                                 '',
                                  '',
                                  parent_moji_folder))
                 elif target_type == 1000:
@@ -242,9 +246,9 @@ class MojiServer:
             all_subdetails = [subdetail for subdetail in words_data["104"] if subdetail["wordId"] == target_id]
             # id 为 target_id 的单词的所有例句和例句翻译
             all_examples = [example for example in words_data["103"] if example["wordId"] == target_id]
-            # TODO 修改笔记获取方式，可以少发一次请求
             # id 为 target_id 的单词的所有笔记
-            # all_notes = [note for note in words_data["300"] if note["targetId"] == target_id]
+            # TODO 自建笔记不公开的话似乎会获取不到
+            all_user_notes = [note for note in words_data["300"] if note["targetId"] == target_id]
 
             excerpt = utils.get(info, "excerpt") or ''
             romaji = utils.get(info, "romaji_hepburn_CN") or ''
@@ -577,6 +581,12 @@ class MojiServer:
                          + ''.join([f'<li>{trans}</li>' for trans in trans_list]) \
                          + '</ol>'
 
+            
+            if all_user_notes is not None and len(all_user_notes) > 0:
+                note_html = all_user_notes[0]['content']
+            else:
+                note_html = ''
+
             # 关于 xxx_html.replace('\n', ' ') :
             # 用于去除HTML片段中的换行
             # 在 Ankidroid 中，有一个设置选项为 “用 HTML 替换换行”
@@ -586,6 +596,7 @@ class MojiServer:
                 'part_of_speech': part_of_speech_html.replace('\n', ' '),
                 'trans': trans_html.replace('\n', ' '),
                 'examples': examples_html.replace('\n', ' '),
+                'note': note_html.replace('\n', ' '),
                 'excerpt': excerpt_html.replace('\n', ' '),
                 'spell': utils.get(info, "spell") or '',
                 'accent': utils.get(info, "accent") or '',
