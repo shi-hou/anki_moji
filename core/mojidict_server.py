@@ -275,11 +275,11 @@ class MojiServer:
                     sub_part_of_speech_title_list = []
                     jita = utils.get(part_of_speech, "jita")
                     katuyou = utils.get(part_of_speech, "katuyou")
-                    has_jita = jita is not None and jita >= 0
-                    has_katuyou = katuyou is not None and katuyou >= 0
+                    has_jita = jita is not None and jita > 0
+                    has_katuyou = katuyou is not None and katuyou > 0
                     part_of_speech_list = utils.get(part_of_speech, "partOfSpeech") or []
                     valid_part_of_speech_list = [part_of_speech for part_of_speech in part_of_speech_list if
-                                                 part_of_speech is not None and 0 <= part_of_speech < 20]
+                                                 part_of_speech is not None and 0 < part_of_speech < 20]
 
                     if len(valid_part_of_speech_list) > 0:
                         color_word_tag_underline_list.append(["",
