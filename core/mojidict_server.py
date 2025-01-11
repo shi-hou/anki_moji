@@ -22,6 +22,7 @@ URL_SENTENCES = 'https://api.mojidict.com/parse/functions/nlt-fetchManySentences
 URL_TTS = 'https://api.mojidict.com/parse/functions/tts-fetch'
 URL_LOGIN = 'https://api.mojidict.com/parse/functions/login'
 URL_USER_NOTE = 'https://api.mojidict.com/parse/functions/getNote'
+URL_GET_ALL_USER_CONFIGS = 'https://api.mojidict.com/parse/functions/getAllUserConfigs'
 
 CLIENT_VERSION = 'js3.4.1'
 APPLICATION_ID = 'E62VyFVLMiW7kvbtVq3p'
@@ -94,6 +95,8 @@ class MojiServer:
         self.session_token = None
         # 记录生成登录token的时间
         self.session_token_datetime = None
+        # 用户的发音设置
+        self.voice_id = None
         # 记录上次请求完成的时间，保证多次请求接口之间的间隔，防止请求过快
         self.last_requests = {}
         self.should_retry: Optional[Callable] = None
@@ -673,7 +676,7 @@ class MojiServer:
             'g_os': 'PCWeb',
             'tarId': word.target_id,
             'tarType': word.target_type,
-            'voiceId': 'f000',
+            'voiceId': self.voice_id,
             "_SessionToken": self.session_token,
             "_ApplicationId": APPLICATION_ID,
             "_InstallationId": INSTALLATION_ID,
@@ -695,6 +698,23 @@ class MojiServer:
             raise Exception(f'获取单词发音文件异常, {url}')
         return res.content
 
+    def get_voice_id(self):
+        self.pre_request('get_voice_id')
+        r = requests.post(URL_GET_ALL_USER_CONFIGS, json={
+            'g_os': 'PCWeb',
+            "_SessionToken": self.session_token,
+            "_ApplicationId": APPLICATION_ID,
+            "_InstallationId": INSTALLATION_ID,
+            "_ClientVersion": CLIENT_VERSION
+        }, headers=headers, timeout=(5, 5))
+        self.post_request('get_voice_id')
+
+        configs_json = utils.get(r.json(), 'result.result.fav')
+        if not configs_json:
+            return 'f002'
+        else:
+            return json.loads(configs_json)['voiceId']
+
     def login(self, passwd, email=None, countryCode=None, mobile=None):
         self.pre_request('login')
         r = requests.post(URL_LOGIN, json={
@@ -712,6 +732,7 @@ class MojiServer:
         if not self.session_token:
             raise Exception('登录失败')
         self.session_token_datetime = datetime.datetime.now()
+        self.voice_id = self.get_voice_id()
 
     def session_valid(self):
         return (self.session_token is not None) and (self.session_token_datetime is not None) and (
