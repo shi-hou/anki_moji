@@ -6,6 +6,7 @@ import re
 
 from aqt import mw
 from aqt.reviewer import Reviewer
+from aqt.browser.previewer import BrowserPreviewer
 
 from . import common
 from .gui import login_if_need, UpdateWindow
@@ -25,18 +26,26 @@ def on_field_filter(text, field, filter_, context):
 def on_js_message(handled, url, context):
     try:
         if url == "MojiToAnki_update":
-            if not isinstance(context, Reviewer):
-                return handled
-            card = context.card
-            note = card.note()
-            moji_server: MojiServer = common.moji_server
-            login_if_need(moji_server, parent=mw)
-            window = UpdateWindow(mw, moji_server, note)
-            window.exec()
+            if isinstance(context, Reviewer):
+                card = context.card
+                note = card.note()
+                moji_server: MojiServer = common.moji_server
+                login_if_need(moji_server, parent=mw)
+                window = UpdateWindow(mw, moji_server, note)
+                window.exec()
 
-            if window.op_changes:
-                context.op_executed(window.op_changes, None, True)
-            return True, None
+                if window.op_changes:
+                    context.op_executed(window.op_changes, None, True)
+                return True, None
+            elif isinstance(context, BrowserPreviewer):
+                card = context.card()
+                note = card.note()
+                moji_server: MojiServer = common.moji_server
+                login_if_need(moji_server, parent=context)
+                window = UpdateWindow(context, moji_server, note)
+                window.exec()
+                context.render_card()
+                return True, None
     except Exception:
         common.get_logger().exception('on_js_message failed')
         return True, None
