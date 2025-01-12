@@ -299,6 +299,10 @@ body.nightMode {
     z-index: -1;
 }
 
+.word-speech:nth-of-type(n+2) {
+    display: none;
+}
+
 .split—line {
     background: var(--color-grey-third);
     height: 12px;
