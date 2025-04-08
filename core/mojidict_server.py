@@ -242,6 +242,21 @@ class MojiServer:
 
             # id 为 target_id 的单词的信息
             info = results[0]
+
+            # 自定义释义例句笔记列表
+            custom_list = [part_of_speech for part_of_speech in words_data["108"] if part_of_speech["wordId"] == target_id]
+
+            custom_example_ids = []
+            custom_subdetails_ids = []
+            custom_note_ids = []
+            
+            if len(custom_list) > 0:
+                custom_example_ids = utils.get(custom_list[0], "exampleIds") or []
+                custom_subdetails_ids = utils.get(custom_list[0], "subdetailsIds") or []
+                custom_note_ids = utils.get(custom_list[0], "noteIds") or []
+                
+
+
             # id 为 target_id 的单词的所有词性
             all_part_of_speech \
                 = [part_of_speech for part_of_speech in words_data["105"] if part_of_speech["wordId"] == target_id]
@@ -249,9 +264,13 @@ class MojiServer:
             all_subdetails = [subdetail for subdetail in words_data["104"] if subdetail["wordId"] == target_id]
             # id 为 target_id 的单词的所有例句和例句翻译
             all_examples = [example for example in words_data["103"] if example["wordId"] == target_id]
+            if custom_example_ids:
+                all_examples = [example for example in all_examples if example["relaId"] in custom_example_ids]
             # id 为 target_id 的单词的所有笔记
             # TODO 自建笔记不公开的话似乎会获取不到
             all_user_notes = [note for note in words_data["300"] if note["targetId"] == target_id]
+            if custom_note_ids:
+                all_user_notes = [note for note in all_user_notes if note["objectId"] in custom_note_ids]
 
             excerpt = utils.get(info, "excerpt") or ''
             romaji = utils.get(info, "romaji_hepburn_CN") or ''
@@ -420,6 +439,11 @@ class MojiServer:
             #     "notationTitle-ja": "xxx",
             #     "title-zh": "xxx",
             # }
+
+            subdetails_ids = custom_subdetails_ids or utils.get(info, "subdetailsIds") or []
+            all_subdetails = list(filter(lambda e: utils.get(e, "relaId") in subdetails_ids, all_subdetails))
+            all_subdetails.sort(key=lambda e: subdetails_ids.index(utils.get(e, "relaId")))
+        
             for subdetail in all_subdetails:
                 subdetail_id = utils.get(subdetail, "relaId")
                 if subdetail_id not in subdetail_dict:
